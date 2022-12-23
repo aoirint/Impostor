@@ -5,6 +5,7 @@ using Impostor.Api;
 using Impostor.Api.Config;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Messages;
@@ -58,17 +59,17 @@ namespace Impostor.Server.Net
         {
             var flag = reader.Tag;
 
-            _logger.LogTrace("[{0}] Server got {1}.", Id, flag);
+            _logger.LogTrace("[{0}] Server got {1}.", Id, MessageFlags.FlagToString(flag));
 
             switch (flag)
             {
                 case MessageFlags.HostGame:
                 {
                     // Read game settings.
-                    var gameInfo = Message00HostGameC2S.Deserialize(reader);
+                    Message00HostGameC2S.Deserialize(reader, out var gameOptions, out _, out var gameFilterOptions);
 
                     // Create game.
-                    var game = await _gameManager.CreateAsync(this, gameInfo);
+                    var game = await _gameManager.CreateAsync(this, gameOptions, gameFilterOptions);
 
                     if (game == null)
                     {
@@ -259,8 +260,8 @@ namespace Impostor.Server.Net
 
                 case MessageFlags.GetGameListV2:
                 {
-                    Message16GetGameListC2S.Deserialize(reader, out var options, out _);
-                    await OnRequestGameListAsync(options);
+                    Message16GetGameListC2S.Deserialize(reader, out var options, out _, out _, out var filterOptions);
+                    await OnRequestGameListAsync(options, filterOptions);
                     break;
                 }
 
@@ -358,11 +359,11 @@ namespace Impostor.Server.Net
         ///     All options given.
         ///     At this moment, the client can only specify the map, impostor count and chat language.
         /// </param>
-        private ValueTask OnRequestGameListAsync(GameOptionsData options)
+        private ValueTask OnRequestGameListAsync(IGameOptions options, GameFilterOptions filterOptions)
         {
             using var message = MessageWriter.Get(MessageType.Reliable);
 
-            var games = _gameManager.FindListings((MapFlags)options.Map, options.NumImpostors, options.Keywords, this.GameVersion);
+            var games = _gameManager.FindListings((MapFlags)options.Map, options.NumImpostors, options.Keywords, this.GameVersion, filterOptions.FilterTags);
 
             Message16GetGameListS2C.Serialize(message, games);
 
