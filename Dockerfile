@@ -1,3 +1,5 @@
+ARG RUNTIME_IMAGE=mcr.microsoft.com/dotnet/runtime:7.0
+
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 
 # See for all possible platforms
@@ -35,7 +37,6 @@ RUN case "$TARGETARCH" in \
 
 # Final image.
 # FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/runtime:7.0
-ARG RUNTIME_IMAGE=mcr.microsoft.com/dotnet/runtime:7.0
 FROM --platform=$TARGETPLATFORM "${RUNTIME_IMAGE}"
 WORKDIR /app
 COPY --from=build /app ./
