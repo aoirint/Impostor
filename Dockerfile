@@ -34,7 +34,8 @@ RUN case "$TARGETARCH" in \
   dotnet publish -c release -o /app -r "$NETCORE_PLATFORM" -p:VersionSuffix="$VERSIONSUFFIX" --no-restore ./src/Impostor.Server/Impostor.Server.csproj
 
 # Final image.
-FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/runtime:7.0
+# FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/runtime:7.0
+FROM --platform=$TARGETPLATFORM "${RUNTIME_IMAGE}"
 WORKDIR /app
 COPY --from=build /app ./
 EXPOSE 22023/udp
