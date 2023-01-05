@@ -35,6 +35,7 @@ RUN case "$TARGETARCH" in \
 
 # Final image.
 # FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/runtime:7.0
+ARG RUNTIME_IMAGE=mcr.microsoft.com/dotnet/runtime:7.0
 FROM --platform=$TARGETPLATFORM "${RUNTIME_IMAGE}"
 WORKDIR /app
 COPY --from=build /app ./
