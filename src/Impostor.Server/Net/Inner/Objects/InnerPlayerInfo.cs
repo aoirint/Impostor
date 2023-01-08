@@ -30,11 +30,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public PlayerOutfit CurrentOutfit => Outfits[CurrentOutfitType];
 
-        public RoleTypes RoleType { get; internal set; }
+        public RoleTypes? RoleType { get; internal set; }
 
         public bool Disconnected { get; internal set; }
 
-        public bool IsImpostor => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter;
+        public bool IsImpostor => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.ImpostorGhost;
 
         public bool CanVent => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Engineer;
 
@@ -93,8 +93,7 @@ namespace Impostor.Server.Net.Inner.Objects
             Disconnected = (flag & 1) != 0;
             IsDead = (flag & 4) != 0;
 
-            var roleType = (RoleTypes)reader.ReadUInt16();
-            RoleType = roleType;
+            _ = (RoleTypes)reader.ReadUInt16(); // ignore the RoleType here and only trust the SetRole rpc
 
             var taskCount = reader.ReadByte();
 
