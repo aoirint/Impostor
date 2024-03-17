@@ -1,6 +1,4 @@
 ﻿using Impostor.Api.Events;
-using Impostor.Api.Games;
-using Impostor.Api.Innersloth;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Plugins.Example.Handlers
@@ -76,6 +74,16 @@ namespace Impostor.Plugins.Example.Handlers
                 e.Game.Code,
                 e.PreviousHost.Character?.PlayerInfo.PlayerName,
                 e.NewHost != null ? e.NewHost.Character?.PlayerInfo.PlayerName : "none"
+            );
+        }
+
+        [EventListener]
+        public void OnGameOptionsChanged(IGameOptionsChangedEvent e)
+        {
+            _logger.LogInformation(
+                "Game {code} > new options because of {source}",
+                e.Game.Code,
+                e.ChangedBy
             );
         }
 
